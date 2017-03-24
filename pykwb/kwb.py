@@ -152,7 +152,7 @@ class KWBEasyfire:
 
         self._sense_sensor = []
 
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 0, "RAW SENSE", PROP_SENSOR_RAW))
+        #self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 0, "RAW SENSE", PROP_SENSOR_RAW))
         self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 0, "Vorlauf Ist", PROP_SENSOR_TEMPERATURE))
         self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 2, "Boiler 0 Ist", PROP_SENSOR_TEMPERATURE))
         self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 3, "Kessel Ist", PROP_SENSOR_TEMPERATURE))
@@ -392,6 +392,10 @@ class KWBEasyfire:
     def get_sensors(self):
         """Return the list of sensors."""
         return self._sense_sensor + self._ctrl_sensor
+
+    def get_sense_senor(self):
+        """Return the list of sens sensors."""
+        return self._sense_sensor
 
     def __str__(self):
         """Returns an informational text representation of the object."""
