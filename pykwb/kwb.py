@@ -153,22 +153,15 @@ class KWBEasyfire:
         self._sense_sensor = []
 
         self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 0, "RAW SENSE", PROP_SENSOR_RAW))
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 0, "Supply", PROP_SENSOR_TEMPERATURE))
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 1, "Return", PROP_SENSOR_TEMPERATURE))
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 2, "Boiler 0", PROP_SENSOR_TEMPERATURE))
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 3, "Furnace", PROP_SENSOR_TEMPERATURE))
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 4, "Buffer Tank 2", PROP_SENSOR_TEMPERATURE))
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 5, "Buffer Tank 1", PROP_SENSOR_TEMPERATURE))
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 6, "Outside", PROP_SENSOR_TEMPERATURE))
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 7, "Exhaust", PROP_SENSOR_TEMPERATURE))
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 8, "Unknown", PROP_SENSOR_TEMPERATURE))
-        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 12, "Stoker Channel", PROP_SENSOR_TEMPERATURE))
+        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 0, "Vorlauf Ist", PROP_SENSOR_TEMPERATURE))
+        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 2, "Boiler 0 Ist", PROP_SENSOR_TEMPERATURE))
+        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 3, "Kessel Ist", PROP_SENSOR_TEMPERATURE))
+        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 6, "Aussentemperatur", PROP_SENSOR_TEMPERATURE))
+        self._sense_sensor.append(KWBEasyfireSensor(PROP_PACKET_SENSE, 9, "Raum Ist", PROP_SENSOR_TEMPERATURE))
 
         self._ctrl_sensor = []
 
         self._ctrl_sensor.append(KWBEasyfireSensor(PROP_PACKET_CTRL, 0, "RAW CTRL", PROP_SENSOR_RAW))
-        self._ctrl_sensor.append(KWBEasyfireSensor(PROP_PACKET_CTRL, 17, "Return Mixer", PROP_SENSOR_FLAG))
-        self._ctrl_sensor.append(KWBEasyfireSensor(PROP_PACKET_CTRL, 25, "Unknown Resupply", PROP_SENSOR_FLAG))
 
         self._thread = threading.Thread(target=self.run)
 
@@ -350,15 +343,27 @@ class KWBEasyfire:
 
         data = self._sense_packet_to_data(packet)
 
-        offset = 4
+        if(version == 16):
+            offset = 4
+        elif(version == 32):
+            offset = 5
         i = 0
 
+        self._debug(PROP_LOGLEVEL_DEBUG, "data: " + str(len(data)))
+        self._debug(PROP_LOGLEVEL_DEBUG, "data ll: " + str(data))
         datalen = len(data) - offset - 6
+        self._debug(PROP_LOGLEVEL_DEBUG, "datalen: " + str(datalen))
         temp_count = int(datalen / 2)
+        self._debug(PROP_LOGLEVEL_DEBUG, "temp_count: " + str(datalen))
         temp = []
 
         for i in range(temp_count):
             temp_index = i * 2 + offset
+            self._debug(PROP_LOGLEVEL_DEBUG, "temp_index: " + str(temp_index))
+            self._debug(PROP_LOGLEVEL_DEBUG, "i: " + str(i))
+            self._debug(PROP_LOGLEVEL_DEBUG, "1: " + str(data[temp_index]))
+            self._debug(PROP_LOGLEVEL_DEBUG, "2: " + str(data[temp_index + 1]))
+            self._debug(PROP_LOGLEVEL_DEBUG, "TEMP: " + str(self._decode_temp(data[temp_index], data[temp_index + 1])))
             temp.append(self._decode_temp(data[temp_index], data[temp_index + 1]))
 
         self._debug(PROP_LOGLEVEL_DEBUG, "T: " + str(temp))
